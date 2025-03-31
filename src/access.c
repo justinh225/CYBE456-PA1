@@ -4,24 +4,13 @@
 
 #include "headers/commands.h"
 #include "headers/structures.h"
+#include "headers/app.h"
 
-char* friends_path = "friends.txt";
-
-/* Main Program */
 int main(int argc, char** argv) 
 {
-	/* Setup files */
-	FILE* friends_file = fopen(friends_path, "w+");
-	fclose(friends_file);
-	FILE* lists_file = fopen("lists.txt", "w+");
-	FILE* pictures_file = fopen("pictures.txt", "w+");
-	FILE* audit_file = fopen("audit.txt", "w+");
+	struct profile_state* profile_state = init();
 
-	struct profile_state* profile_state = malloc(sizeof(struct profile_state));
-	profile_state->owner_name = NULL;
-	profile_state->current_viewer = NULL;
-
-	/* Execute Commands */
+	/* Begin Reading commands */
 	char* filename = argv[1]; 
 	printf("Reading commands from file: \'%s\'\n", filename);
 
@@ -31,42 +20,64 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	char command[COMM_SIZE] = { 0 };
-	
+	char command[COMM_SIZE] = { 0 };	
 	while(fgets(command, COMM_SIZE, comm_file) != NULL) {
 
 		command[strlen(command) - 1] = '\0';
 		
 		char* cmmd = strtok(command, " ");
-		char* value = strtok(NULL, " ");
-
-		printf("Executing \'%s\'\n", command);
-
-		if(!strcmp(cmmd, "friendadd")) {
-			friendadd(friends_path, value, profile_state);
-		} else if (!strcmp(cmmd, "viewby")) {
-			
-			if(viewby(friends_path, value, profile_state)) {
-				printf("ERROR: Failed to authenticate friend. Use the \'friendadd\' command to add a new friend.\n");
-				return 1;
+		char text_value[100] = { '\0' };
+		char* values[4] = { NULL };
+		if(!strcmp(cmmd, "writecomments")) {
+			values[0] = strtok(NULL, " ");
+			char* token = strtok(NULL, " ");
+			strcat(text_value, token);
+			token = strtok(NULL, " ");
+			while(token != NULL) {
+				strcat(text_value, " ");
+				strcat(text_value, token);
+				
+				token = strtok(NULL, " ");
 			}
-			printf("Current viewer is \'%s\'.\n", profile_state->current_viewer);
-		} else if (profile_state->current_viewer != NULL) {
+		} else {
+			for(int i = 0; i < 4; i++) {
+				values[i] = strtok(NULL, " ");
+			}
+		}
 
+		/* Execute command */
+		if(!strcmp(cmmd, "friendadd")) {
+			friendadd("friends.txt", values[0], profile_state);
+		} else if (!strcmp(cmmd, "viewby")) {
+			viewby("friends.txt", values[0], profile_state);
+		} else if(!strcmp(cmmd, "end")) {
+			return end(profile_state);
+		} else if (profile_state->current_viewer != NULL) {
+			if(!strcmp(cmmd, "logout")) {
+				logout(profile_state);
+			} else if(!strcmp(cmmd, "listadd")) {
+				listadd(profile_state, values[0]);
+			} else if(!strcmp(cmmd, "friendlist")) {
+				friendlist(profile_state, values[0], values[1]);
+			} else if(!strcmp(cmmd, "postpicture")) {
+				postpicture(profile_state, values[0]);
+			} else if(!strcmp(cmmd, "chlst")) {
+				chlst(profile_state, values[0], values[1]);
+			} else if(!strcmp(cmmd, "chmod")) { 
+				chmod(profile_state, values[0], values[1], values[2], values[3]); 
+			} else if(!strcmp(cmmd, "chown")) {
+				chown(profile_state, values[0], values[1]);
+			} else if (!strcmp(cmmd, "readcomments")) {
+				readcomments(profile_state, values[0]);
+			} else if (!strcmp(cmmd, "writecomments")) {
+				writecomments(profile_state, values[0], text_value);
+			}
 		} else {
 			printf("ERROR: A user must be viewing the profile in order to execute a command.");
 		}
 
 		memset(command, 0, COMM_SIZE * sizeof(command[0]));
-		printf("|%s|\n", profile_state->owner_name);
 	}
 
-	printf("Successfully read commands file.\n");
-	
-	/* Cleanup Files */
-	fclose(lists_file);
-	fclose(pictures_file);
-	fclose(audit_file);
-
-	return 0;
+	return 1;
 }
