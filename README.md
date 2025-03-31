@@ -23,7 +23,7 @@ Contains all source and header files. The files included are as follows:
   - Contains definitions for data structures
 
 ### test:
-Contains all test files used during development and testing. Input commands are contained in ```input.txt```, and expected outputs for files and commands are contained in ```output.txt```.
+Contains all test files used during development and testing. Input commands are contained in ```input.txt``` and expected outputs for files and commands are contained in ```output.txt```.
 - ```test_case_1```, ```test_case_2```
   - Default test cases provided by the instructor
 - ```test_case_3```, ```test_case_4```
