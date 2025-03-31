@@ -11,22 +11,22 @@ The program can be ran using the command ```./access <path_to_test_input>```, wh
 ## Directory Structure and Included Files:
 ### src:
 Contains all source and header files. The files included are as follows:
-- ```access.c```, ```headers/access.h```
+- ```access.c```, ```./headers/access.h```
   - Main program entrypoint
-- ```app.c```, ```headers/app.h```
+- ```app.c```, ```./headers/app.h```
   - Contains implementations and definitions for general commands for the application
-- ```commands.c```, ```headers/commands.h```
+- ```commands.c```, ```./headers/commands.h```
   - Includes implementations and definitions of each command
-- ```acl_actions.c```, ```headers/acl_actions.h```
+- ```acl_actions.c```, ```./headers/acl_actions.h```
   - Contains implementations and definitions for access control
-- ```headers/structures.h```
+- ```./headers/structures.h```
   - Contains definitions for data structures
 
 ### test:
-Contains all test files used during development and testing. Input commands are contained in ```input.txt``` and expected outputs for files and commands are contained in ```output.txt```.
-- ```test_case_1```, ```test_case_2```
+Contains all test files used during development and testing. Input commands are contained in ```input.txt``` and expected output files are contained in the ```./<test_case>/output``` directory.
+- ```./test_case_1```, ```./test_case_2```
   - Default test cases provided by the instructor
-- ```test_case_3```, ```test_case_4```
+- ```./test_case_3```, ```./test_case_4```
   - Custom test cases written during development
    
 
