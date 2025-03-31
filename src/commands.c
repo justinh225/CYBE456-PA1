@@ -2,6 +2,10 @@
 
 int friendadd(char* friends_path, char* friend_name, struct profile_state* state) {
 
+	if(state->owner_name[0] != '\0' && state->current_viewer[0] == '\0') {
+		audit_log("Error: someone must be viewing the profile in order to add a friend");
+		return 1;
+	}
 	if(state->owner_name[0] != '\0' && state->current_viewer[0] != '\0' && strcmp(state->owner_name, state->current_viewer)) {
 		 audit_log("Error: only profile owner may issue friendadd command");
 		return 1;
@@ -70,7 +74,10 @@ int viewby(char* friends_path, char* friend_name, struct profile_state* state) {
 		}			
 	}
 	fclose(file_ptr);
-	
+
+	if(valid)
+		audit_log("Error: user does not exist.");
+
 	return valid;
 }
 
@@ -180,7 +187,7 @@ int friendlist(struct profile_state* state, char* username, char* list_name) {
 int postpicture(struct profile_state* state, char* filename) {
 	
 	if(state->current_viewer[0] == '\0') {
-		audit_log("ERROR: User must be viewing this profile to post a picture.");
+		audit_log("Error: User must be viewing this profile to post a picture.");
 		return 1;
 	}
 
@@ -232,6 +239,10 @@ int chlst(struct profile_state* state, char* file_name, char* list_name) {
 	
 	/* Check if the image exists */
 	struct image* image = state->images;
+	if(image == NULL) {
+		audit_log("ERROR: Image does not exist.");
+		return 1;
+	}
 	while(image != NULL) {
 		if(!strcmp(image->filename, file_name))
 			break;
@@ -295,6 +306,10 @@ int chmod(struct profile_state* state, char* filename, char* owner_perm, char* g
 
 	/* Check if the image exists */
 	struct image* image = state->images;
+	if(image == NULL) {
+		audit_log("ERROR: Image does not exist.");
+		return 1;                                                             
+	}
 	while(image != NULL) {
 		if(!strcmp(image->filename, filename))
 			break;
@@ -336,6 +351,9 @@ int chown(struct profile_state* state, char* filename, char* friendname) {
 
 	/* Check if the image exists */
         struct image* image = state->images;
+	if(image == NULL) {
+		audit_log("Error: image does not exist.");
+		return 1;                                                                      }
         while(image != NULL) {
                 if(!strcmp(image->filename, filename))
                         break;
@@ -360,6 +378,10 @@ void readcomments(struct profile_state* state, char* filename) {
 	
 	/* Check if the image exists */
         struct image* image = state->images;
+	if(image == NULL) {
+		audit_log("Error: image does not exist.");
+		return;
+	}
         while(image != NULL) {
                 if(!strcmp(image->filename, filename))
                         break;
@@ -397,6 +419,10 @@ int writecomments(struct profile_state* state, char* filename, char* text) {
 
 	/* Check if the image exists */
         struct image* image = state->images;
+	if(image == NULL) {
+		audit_log("Error: image does not exist.");
+		return 1;
+	}
         while(image != NULL) {
                 if(!strcmp(image->filename, filename))
                         break;

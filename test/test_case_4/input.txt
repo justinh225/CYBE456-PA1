@@ -1,0 +1,14 @@
+friendadd root
+viewby root
+postpicture file1.txt
+postpicture file2.txt
+chmod file2.txt -- -- --
+friendadd alice
+logout
+viewby alice
+writecomments file2.txt Text from Bob in file2
+readcomments file2.txt
+viewby root
+chown file1.txt alice
+logout
+end
